@@ -4,8 +4,8 @@
 CPP      = g++.exe
 CC       = gcc.exe
 WINDRES  = windres.exe
-OBJ      = main.o rollingHash.o
-LINKOBJ  = main.o rollingHash.o
+OBJ      = rollingHash.o SequenceStore.o main.o MotifFinder.o "QueryEngine\ (1).o" SuffixTrie.o TrieNode.o
+LINKOBJ  = rollingHash.o SequenceStore.o main.o MotifFinder.o "QueryEngine (1).o" SuffixTrie.o TrieNode.o
 LIBS     = -L"C:/Program Files (x86)/Embarcadero/Dev-Cpp/TDM-GCC-64/lib" -L"C:/Program Files (x86)/Embarcadero/Dev-Cpp/TDM-GCC-64/x86_64-w64-mingw32/lib" -static-libgcc
 INCS     = -I"C:/Program Files (x86)/Embarcadero/Dev-Cpp/TDM-GCC-64/include" -I"C:/Program Files (x86)/Embarcadero/Dev-Cpp/TDM-GCC-64/x86_64-w64-mingw32/include" -I"C:/Program Files (x86)/Embarcadero/Dev-Cpp/TDM-GCC-64/lib/gcc/x86_64-w64-mingw32/9.2.0/include"
 CXXINCS  = -I"C:/Program Files (x86)/Embarcadero/Dev-Cpp/TDM-GCC-64/include" -I"C:/Program Files (x86)/Embarcadero/Dev-Cpp/TDM-GCC-64/x86_64-w64-mingw32/include" -I"C:/Program Files (x86)/Embarcadero/Dev-Cpp/TDM-GCC-64/lib/gcc/x86_64-w64-mingw32/9.2.0/include" -I"C:/Program Files (x86)/Embarcadero/Dev-Cpp/TDM-GCC-64/lib/gcc/x86_64-w64-mingw32/9.2.0/include/c++"
@@ -24,8 +24,23 @@ clean: clean-custom
 $(BIN): $(OBJ)
 	$(CPP) $(LINKOBJ) -o $(BIN) $(LIBS)
 
+rollingHash.o: rollingHash.cpp
+	$(CPP) -c rollingHash.cpp -o rollingHash.o $(CXXFLAGS)
+
+SequenceStore.o: SequenceStore.cpp
+	$(CPP) -c SequenceStore.cpp -o SequenceStore.o $(CXXFLAGS)
+
 main.o: main.cpp
 	$(CPP) -c main.cpp -o main.o $(CXXFLAGS)
 
-rollingHash.o: rollingHash.cpp
-	$(CPP) -c rollingHash.cpp -o rollingHash.o $(CXXFLAGS)
+MotifFinder.o: MotifFinder.cpp
+	$(CPP) -c MotifFinder.cpp -o MotifFinder.o $(CXXFLAGS)
+
+"QueryEngine\ (1).o": QueryEngine\ (1).cpp
+	$(CPP) -c "QueryEngine (1).cpp" -o "QueryEngine (1).o" $(CXXFLAGS)
+
+SuffixTrie.o: SuffixTrie.cpp
+	$(CPP) -c SuffixTrie.cpp -o SuffixTrie.o $(CXXFLAGS)
+
+TrieNode.o: TrieNode.cpp
+	$(CPP) -c TrieNode.cpp -o TrieNode.o $(CXXFLAGS)
