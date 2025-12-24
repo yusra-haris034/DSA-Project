@@ -17,11 +17,11 @@ class SequenceStore{
 	
 	public:
 		SequenceStore();
-		int addSequence(const string& seq , string& name = "");
+		int addSequence(const string& seq ,const string& name);
 		string getSequence (int id) const;
 		const vector<string>& getAllSequences();
 		int getSequenceCount() const;
 		void clear();
 		string cleanSequence(const string& seq);
-		
+		const vector <SequenceMetaData>& getMetaData() const;
 };
