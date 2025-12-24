@@ -1,6 +1,7 @@
 #include "MotifFinder.h"
 #include <algorithm>
 #include <unordered_map>
+#include <deque>
 
 using namespace std;
 
@@ -24,50 +25,61 @@ vector<MotifResult> MotifFinder::findFrequentMotifs(
         return results;
 
     unordered_map<long long, int> motifCounts;
-    unordered_map<long long, string> hashToMotif;
-
-    string firstWindow = sequence.substr(0, k);
-    long long hash = hasher.computeHash(firstWindow);
+    unordered_map<long long, vector<string>> hashBuckets;
+    
+    deque<char> windowQ;
+    long long hash =0;
+    
+    //first window
+    for (int i =0 ; i< k ;i++)
+    	windowQ.push_back(sequence[i]);
+    	
+    string windowStr(windowQ.begin() , windowQ.end());
+	hash = hasher.computeHash(windowStr);
 
     motifCounts[hash]++;
-    hashToMotif[hash] = firstWindow;
+    hashBuckets[hash].push_back(windowStr);
     
-    cout << "[DEBUG] First window: " << firstWindow 
-         << " | Hash: " << hash 
-         << " | Count: " << motifCounts[hash] << endl;
-
-    // Rolling through the sequence
-    for (int i = k; i < sequence.length(); i++) {
-        char oldChar = sequence[i - k];
-        char newChar = sequence[i];
-
-        hash = hasher.rollHash(hash, oldChar, newChar, k);
-        motifCounts[hash]++;
-
-        if (hashToMotif.find(hash) == hashToMotif.end()) {
-            hashToMotif[hash] = sequence.substr(i - k + 1, k);
-        }
-        
-        cout << "[DEBUG] Window: " << sequence.substr(i - k + 1, k)
-             << " | Hash: " << hash 
-             << " | Count: " << motifCounts[hash] << endl;
-    }
-
+    //sliding the window:
+    for (int i =k ; i <sequence.length() ; i++){
+    	char oldChar = windowQ.front();
+    	windowQ.pop_front();
+    	
+    	char newChar = sequence[i];
+    	windowQ.push_back(newChar);
+    	
+    	hash = hasher.rollHash(hash, oldChar, newChar, k);
+    	
+    	string current(windowQ.begin() , windowQ.end());
+    	motifCounts[hash]++;
+    	hashBuckets[hash].push_back(current);
+	}
+    
+   
     int totalWindows = sequence.length() - k + 1;
 
-    // Collect results
     unordered_map<long long, int>::iterator it;
+    
     for (it = motifCounts.begin(); it != motifCounts.end(); ++it) {
         if (it->second >= minFreq) {
-            MotifResult r;
-            r.motif = hashToMotif[it->first];
-            r.count = it->second;
-            r.freq = (it->second * 100.0) / totalWindows; 
-            results.push_back(r);
-            
-            cout << "[DEBUG] Added Motif: " << r.motif 
-                 << " | Count: " << r.count 
-                 << " | Freq: " << r.freq << "%" << endl;
+        	unordered_map<string , int> exactCount;
+        	
+        	vector<string>:: iterator vIt;
+        	
+        	for (vIt = hashBuckets[it->first].begin(); vIt != hashBuckets[it->first].end(); ++vIt){
+        		exactCount[*vIt]++;
+			}
+			
+			unordered_map<string , int> :: iterator eIt;
+			for (eIt = exactCount.begin() ; eIt != exactCount.end(); ++eIt){
+				if (eIt->second >= minFreq){
+					MotifResult r;
+					r.motif = eIt->first;
+					r.count = eIt->second;
+					r.freq = (eIt->second * 100.0) / totalWindows;
+					results.push_back(r); 
+				}
+			}
         }
     }
 
